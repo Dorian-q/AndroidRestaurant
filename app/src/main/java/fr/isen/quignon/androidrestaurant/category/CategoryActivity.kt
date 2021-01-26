@@ -1,10 +1,12 @@
-package fr.isen.quignon.androidrestaurant
+package fr.isen.quignon.androidrestaurant.category
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import fr.isen.quignon.androidrestaurant.HomeActivity
+import fr.isen.quignon.androidrestaurant.R
 import fr.isen.quignon.androidrestaurant.category.CategoryAdapter
 import fr.isen.quignon.androidrestaurant.databinding.ActivityCategoryBinding
 

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">androidrestaurant</string>
+    <string name="hello">Bienvenue\nchez</string>
+
+    <string name="starter">Entrées</string>
+    <string name="main">Plats</string>
+    <string name="dessert">Désserts</string>
+
+    <string name="toast_content">Contenu du toast</string>
 </resources>
