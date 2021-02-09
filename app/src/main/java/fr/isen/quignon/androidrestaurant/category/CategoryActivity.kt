@@ -1,102 +1,82 @@
 package fr.isen.quignon.androidrestaurant.category
 
-import androidx.appcompat.app.AppCompatActivity
+
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.GsonBuilder
-import org.json.JSONObject
-import android.content.Context
-import android.content.Intent
-
-import fr.isen.quignon.androidrestaurant.BaseActivity
-import fr.isen.quignon.androidrestaurant.utils.Loader
 import fr.isen.quignon.androidrestaurant.HomeActivity
 import fr.isen.quignon.androidrestaurant.R
-import fr.isen.quignon.androidrestaurant.category.CategoryAdapter
 import fr.isen.quignon.androidrestaurant.databinding.ActivityCategoryBinding
-import fr.isen.quignon.androidrestaurant.network.Dish
-import fr.isen.quignon.androidrestaurant.network.MenuResult
 import fr.isen.quignon.androidrestaurant.network.NetworkConstant
+import fr.isen.quignon.androidrestaurant.network.MenuResult
+import fr.isen.quignon.androidrestaurant.network.Dish
+import org.json.JSONObject
+import com.google.gson.GsonBuilder
+import fr.isen.quignon.androidrestaurant.BaseActivity
 import fr.isen.quignon.androidrestaurant.detail.DetailActivity
+import fr.isen.quignon.androidrestaurant.HomeActivity.Companion.CATEGORY_NAME
+import fr.isen.quignon.androidrestaurant.basket.Basket.Companion.USER_PREFERENCES_NAME
+import fr.isen.quignon.androidrestaurant.detail.DishCellClickListener
+import fr.isen.quignon.androidrestaurant.utils.Loader
 
-enum class ItemType {
-    STARTER, MAIN, DESSERT;
-
-    companion object {
-        fun categoryTitle(item: ItemType?) : String {
-            return when(item) {
-                STARTER -> "Entrées"
-                MAIN -> "Plats"
-                DESSERT -> "Desserts"
-                else -> ""
-            }
-        }
-    }
+enum class  ItemType{
+    ENTREE,
+    PLAT,
+    DESSERT;
 }
 
-class CategoryActivity : BaseActivity() {
+class CategoryActivity : BaseActivity(), DishCellClickListener {
 
-    private lateinit var bindind: ActivityCategoryBinding
-
+    private lateinit var binding: ActivityCategoryBinding
+    @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bindind = ActivityCategoryBinding.inflate(layoutInflater)
-        setContentView(bindind.root)
+        binding = ActivityCategoryBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val selectedItem = intent.getSerializableExtra(HomeActivity.CATEGORY_NAME) as? ItemType
+        val title = binding.categoryTitleTextView
+        val selectedCategory: ItemType? = intent.getSerializableExtra(HomeActivity.CATEGORY_NAME) as? ItemType
 
-        bindind.swipeLayout.setOnRefreshListener {
+        binding.swipeLayout.setOnRefreshListener {
             resetCache()
-            makeRequest(selectedItem)
+            loadList(selectedCategory)
         }
-
-        bindind.categoryTitle.text = getCategoryTitle(selectedItem)
-
-        loadList(listOf<Dish>())
-
-        makeRequest(selectedItem)
+        title.text = getCategoryTitle(selectedCategory)
+        loadList(selectedCategory)
         Log.d("lifecycle", "onCreate")
     }
 
-    private fun makeRequest(selectedItem: ItemType?) {
+    private fun loadList(category: ItemType?) {
         resultFromCache()?.let {
-            // La requete est en cache
-            parseResult(it, selectedItem)
+            onSuccess(parseResult(it, category))
         } ?: run {
-            // La requete n'est pas en cache
             val loader = Loader()
-            loader.show(this, "récupération du menu")
+            loader.show(this, "Chargement du menu")
             val queue = Volley.newRequestQueue(this)
-            val url = NetworkConstant.BASE_URL + NetworkConstant.PATH_MENU
-
+            val url = NetworkConstant.BASE_URL
             val jsonData = JSONObject()
-            jsonData.put(NetworkConstant.ID_SHOP, "1")
-
-            var request = JsonObjectRequest(
+            jsonData.put("id_shop", "1")
+            val request = JsonObjectRequest(
                 Request.Method.POST,
                 url,
                 jsonData,
-                { response ->
-                    loader.hide(this)
-                    bindind.swipeLayout.isRefreshing = false
+                Response.Listener { response ->
+                    binding.swipeLayout.isRefreshing = false
                     cacheResult(response.toString())
-                    parseResult(response.toString(), selectedItem)
-                },
-                { error ->
                     loader.hide(this)
-                    bindind.swipeLayout.isRefreshing = false
-                    error.message?.let {
-                        Log.d("request", it)
-                    } ?: run {
-                        Log.d("request", error.toString())
-                    }
+                    onSuccess(parseResult(response.toString(), category))
+                },
+                Response.ErrorListener { error ->
+                    loader.hide(this)
+                    binding.swipeLayout.isRefreshing = false
+                    onFailure(error)
                 }
             )
             queue.add(request)
@@ -123,50 +103,49 @@ class CategoryActivity : BaseActivity() {
         return sharedPreferences.getString(REQUEST_CACHE, null)
     }
 
-    private fun parseResult(response: String, selectedItem: ItemType?) {
+    private fun parseResult(response: String, selectedItem: ItemType?): List<Dish>? {
         val menuResult = GsonBuilder().create().fromJson(response, MenuResult::class.java)
-        val items = menuResult.data.firstOrNull { it.name == ItemType.categoryTitle(selectedItem) }
-        loadList(items?.items)
+        val items = menuResult.data.firstOrNull { it.name == getCategoryTitleFr(selectedItem) }
+        return items?.items
     }
 
-    private fun loadList(dishes: List<Dish>?) {
+    private fun onSuccess(dishes: List<Dish>?) {
         dishes?.let {
-            val adapter = CategoryAdapter(it) { dish ->
-                val intent = Intent(this, DetailActivity::class.java)
-                intent.putExtra(DetailActivity.DISH_EXTRA, dish)
-                startActivity(intent)
-            }
-            bindind.recyclerView.layoutManager = LinearLayoutManager(this)
-            bindind.recyclerView.adapter = adapter
+            // CellClickListener = this because this implements CellClickListener
+            val adapter = CategoryAdapter(it, this)
+            binding.recyclerView.layoutManager = LinearLayoutManager(this)
+            binding.recyclerView.adapter = adapter
         }
+    }
+    private fun onFailure(error: VolleyError) {
+        Log.d("Request", error.toString())
+    }
+
+    override fun onCellClickListener(data: Dish) {
+        val intent = Intent(this, DetailActivity::class.java)
+        intent.putExtra(PLAT, data)
+        startActivity(intent)
     }
 
     private fun getCategoryTitle(item: ItemType?): String {
         return when(item) {
-            ItemType.STARTER -> getString(R.string.starter)
-            ItemType.MAIN -> getString(R.string.main)
+            ItemType.ENTREE -> getString(R.string.entree)
+            ItemType.PLAT -> getString(R.string.plat)
+            ItemType.DESSERT -> getString(R.string.dessert)
+            else -> ""
+        }
+    }
+    private fun getCategoryTitleFr(item: ItemType?): String {
+        return when(item) {
+            ItemType.ENTREE -> getString(R.string.entree)
+            ItemType.PLAT -> getString(R.string.plat)
             ItemType.DESSERT -> getString(R.string.dessert)
             else -> ""
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Log.d("lifecycle", "onResume")
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Log.d("lifecycle", "onRestart")
-    }
-
-    override fun onDestroy() {
-        Log.d("lifecycle", "onDestroy")
-        super.onDestroy()
-    }
-
     companion object {
-        const val USER_PREFERENCES_NAME = "USER_PREFERENCES_NAME"
+        const val PLAT = "DISH"
         const val REQUEST_CACHE = "REQUEST_CACHE"
     }
 }

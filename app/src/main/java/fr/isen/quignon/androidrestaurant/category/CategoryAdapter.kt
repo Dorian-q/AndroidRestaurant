@@ -1,49 +1,44 @@
 package fr.isen.quignon.androidrestaurant.category
 
+import android.annotation.SuppressLint
+import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ExpandableListView
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
-
-import fr.isen.quignon.androidrestaurant.databinding.DishesCellBinding
-import fr.isen.quignon.androidrestaurant.network.Dish
-import fr.isen.quignon.androidrestaurant.R
 import com.squareup.picasso.Picasso
+import fr.isen.quignon.androidrestaurant.databinding.DishCellBinding
+import fr.isen.quignon.androidrestaurant.detail.DishCellClickListener
+import fr.isen.quignon.androidrestaurant.network.Dish
 
 class CategoryAdapter(private val entries: List<Dish>,
-                      private val entryClickListener: (Dish) -> Unit)
-    : RecyclerView.Adapter<CategoryAdapter.DishesViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DishesViewHolder {
-        return DishesViewHolder(DishesCellBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+                      private val cellClickListener: DishCellClickListener):
+    RecyclerView.Adapter<CategoryAdapter.DishViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DishViewHolder {
+        return DishViewHolder(DishCellBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(holder: DishesViewHolder, position: Int) {
-        val dish = entries[position]
-        holder.layout.setOnClickListener {
-            entryClickListener.invoke(dish)
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: DishViewHolder, position: Int) {
+        holder.dishTitle.text = entries[position].name.take(40)
+        holder.dishPrice.text = "${entries[position].prices[0].price}€"
+        if (entries[position].images[0].isNotEmpty()) {
+            Picasso.get().load(entries[position].images[0]).into(holder.dishImageView);
         }
-        holder.bind(dish)
+        holder.layout.setOnClickListener {
+            cellClickListener.onCellClickListener(entries[position])
+        }
     }
-
     override fun getItemCount(): Int {
         return entries.count()
     }
 
-    class DishesViewHolder(dishesBinding: DishesCellBinding): RecyclerView.ViewHolder(dishesBinding.root) {
-        val titleView: TextView = dishesBinding.dishesTitle
-        val priceView: TextView = dishesBinding.dishPrice
-        val imageView: ImageView = dishesBinding.dishImageView
-        val layout = dishesBinding.root
+    class DishViewHolder (dishBinding: DishCellBinding): RecyclerView.ViewHolder(dishBinding.root) {
 
-        fun bind(dish: Dish) {
-            titleView.text = dish.name
-            priceView.text = "${dish.prices.first().price} €"
-            Picasso.get()
-                .load(dish.getThumbnailUrl())
-                .placeholder(R.drawable.logo_resto)
-                .into(imageView)
-        }
+        val dishTitle: TextView= dishBinding.dishTitle
+        val dishPrice: TextView= dishBinding.dishPrice
+        val dishImageView: ImageView= dishBinding.dishImageView
+        val layout: CardView = dishBinding.root
     }
 }

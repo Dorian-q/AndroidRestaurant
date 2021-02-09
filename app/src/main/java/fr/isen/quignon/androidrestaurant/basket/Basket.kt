@@ -1,37 +1,34 @@
 package fr.isen.quignon.androidrestaurant.basket
 
 import android.content.Context
-import fr.isen.quignon.androidrestaurant.network.Dish
-import fr.isen.quignon.androidrestaurant.detail.DetailActivity
+import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.io.Serializable
+import fr.isen.quignon.androidrestaurant.detail.DetailActivity
 
 class Basket (val items: MutableList<BasketItem>): Serializable {
 
-    var itemsCount: Int = 0
+    var count: Int = 0
         get() {
-            return if(items.count() > 0) {
-                items
-                        .map { it.count }
-                        .reduce { acc, i -> acc + i }
-            } else {
-                0
+            if (this.items.count() > 0) {
+                return this.items
+                    .map { it.itemCount }
+                    .reduce { acc, i -> acc + i }
             }
+            return field
         }
-
 
     fun addItem(item: BasketItem) {
         val existingItem = items.firstOrNull {
             it.dish.name == item.dish.name
         }
         existingItem?.let {
-            existingItem.count += item.count
+            existingItem.itemCount = item.itemCount
         } ?: run {
             items.add(item)
         }
     }
-
     fun clear() {
         items.clear()
     }
@@ -39,31 +36,24 @@ class Basket (val items: MutableList<BasketItem>): Serializable {
     fun save(context: Context) {
         val jsonFile = File(context.cacheDir.absolutePath + BASKET_FILE)
         jsonFile.writeText(GsonBuilder().create().toJson(this))
-        updateCounter(context)
-    }
-
-    private fun updateCounter(context: Context) {
         val sharedPreferences = context.getSharedPreferences(USER_PREFERENCES_NAME, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putInt(ITEMS_COUNT, itemsCount)
+        editor.putInt(BASKET_COUNT, count)
         editor.apply()
     }
 
     companion object {
         fun getBasket(context: Context): Basket {
             val jsonFile = File(context.cacheDir.absolutePath + BASKET_FILE)
-            return if(jsonFile.exists()) {
+            if(jsonFile.exists()) {
                 val json = jsonFile.readText()
-                GsonBuilder().create().fromJson(json, Basket::class.java)
-            } else {
-                Basket(mutableListOf())
+                return GsonBuilder().create().fromJson(json, Basket::class.java)
             }
+            return Basket(mutableListOf())
         }
 
         const val BASKET_FILE = "basket.json"
-        const val ITEMS_COUNT = "ITEMS_COUNT"
+        const val BASKET_COUNT = "BASKET_COUNT"
         const val USER_PREFERENCES_NAME = "USER_PREFERENCES_NAME"
     }
 }
-
-class BasketItem(val dish: Dish, var count: Int): Serializable {}

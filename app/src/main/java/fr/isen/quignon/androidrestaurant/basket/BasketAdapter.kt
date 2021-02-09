@@ -1,65 +1,40 @@
 package fr.isen.quignon.androidrestaurant.basket
 
-import android.content.Context
-import android.media.Image
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-
-import fr.isen.quignon.androidrestaurant.R
 import fr.isen.quignon.androidrestaurant.databinding.BasketCellBinding
 import com.squareup.picasso.Picasso
 
-
-interface BasketCellInterface {
-    fun onDeleteItem(item: BasketItem)
-    fun onShowDetail(item: BasketItem) // Optional
-}
-
-class BasketAdapter(private val basket: Basket,
-                    private val context:Context,
-                    private val delegate: BasketCellInterface
-): RecyclerView.Adapter<BasketAdapter.BasketViewHolder>() {
-
-    class BasketViewHolder(binding: BasketCellBinding): RecyclerView.ViewHolder(binding.root) {
-        private val itemTitle: TextView = binding.basketItemTitle
-        private val itemPrice: TextView = binding.basketItemPrice
-        private val itemQuantity: TextView = binding.basketItemQuantity
-        private val itemImageView: ImageView = binding.basketItemImageView
-        private val deleteButton: ImageView = binding.basketItemDelete
-        val layout = binding.root
-
-        fun bind(item: BasketItem, context: Context, delegate: BasketCellInterface) {
-            itemTitle.text = item.dish.name
-            itemPrice.text = "${item.dish.prices.first().price}€"
-            itemQuantity.text = "${context.getString(R.string.quantity)} ${item.count.toString()}"
-            Picasso.get()
-                    .load(item.dish.getThumbnailUrl())
-                    .placeholder(R.drawable.logo_resto)
-                    .into(itemImageView)
-            deleteButton.setOnClickListener {
-                //delegate.onDeleteItem(item)
-                delegate.onDeleteItem(item)
-            }
-        }
+class BasketAdapter(private val items: List<BasketItem>, private val basketCellClickListener: BasketCellClickListener): RecyclerView.Adapter<BasketAdapter.BasketItemsViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasketItemsViewHolder {
+        return BasketItemsViewHolder(BasketCellBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BasketViewHolder {
-        return BasketViewHolder(BasketCellBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-    }
-
-    override fun onBindViewHolder(holder: BasketViewHolder, position: Int) {
-        val item = basket.items[position]
-        holder.layout.setOnClickListener {
-            // Click sur detail item
-            delegate.onShowDetail(item)
+    @SuppressLint("SetTextI18n")
+    override fun onBindViewHolder(holder: BasketItemsViewHolder, position: Int) {
+        holder.dishName.text = items[position].dish.name.take(40)
+        holder.dishPrice.text = "${items[position].dish.prices[0].price.toFloat() * items[position].itemCount} €"
+        if (items[position].dish.images[0].isNotEmpty()) {
+            Picasso.get().load(items[position].dish.images[0]).into(holder.dishImage)
         }
-        holder.bind(item, context, delegate)
+        holder.btnDelete.setOnClickListener {
+            basketCellClickListener.onDeleteItem(items[position])
+        }
+        holder.dishQuantity.text = "${items[position].itemCount} * ${items[position].dish.prices[0].price.toFloat()}"
     }
 
     override fun getItemCount(): Int {
-        return basket.items.count()
+        return items.count()
+    }
+
+    class BasketItemsViewHolder(basketCellBinding: BasketCellBinding): RecyclerView.ViewHolder(basketCellBinding.root) {
+        val dishName: TextView = basketCellBinding.basketItemTitle
+        val dishPrice: TextView = basketCellBinding.basketItemPrice
+        val dishImage: ImageView = basketCellBinding.basketItemImageView
+        val dishQuantity: TextView = basketCellBinding.basketItemQuantity
+        val btnDelete: ImageView = basketCellBinding.basketItemDelete
     }
 }

@@ -1,79 +1,112 @@
 package fr.isen.quignon.androidrestaurant.detail
 
-
-import android.content.Context
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AlertDialog
-import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import kotlin.math.max
-
+import android.annotation.SuppressLint
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import fr.isen.quignon.androidrestaurant.BaseActivity
 import fr.isen.quignon.androidrestaurant.R
 import fr.isen.quignon.androidrestaurant.basket.Basket
 import fr.isen.quignon.androidrestaurant.basket.BasketItem
-import fr.isen.quignon.androidrestaurant.network.Dish
+import fr.isen.quignon.androidrestaurant.category.CategoryActivity.Companion.PLAT
 import fr.isen.quignon.androidrestaurant.databinding.ActivityDetailBinding
-import fr.isen.quignon.androidrestaurant.category.CategoryActivity
-import fr.isen.quignon.androidrestaurant.HomeActivity
+import fr.isen.quignon.androidrestaurant.network.Dish
 
-class DetailActivity : BaseActivity() {
-    companion object {
-        const val DISH_EXTRA = "DISH_EXTRA"
-    }
+class DetailActivity: BaseActivity() {
 
-    lateinit var binding: ActivityDetailBinding
+    private lateinit var binding: ActivityDetailBinding
+    private var imageCount = 0
     private var itemCount = 1
+    private lateinit var dish: Dish
+    private var price: Float = 0.0F
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val dish = intent.getSerializableExtra(DISH_EXTRA) as? Dish
-        dish?.let {
-            setupView(it)
+        val pageAdapter = PhotoSlideAdapter(this)
+        binding.imagesCarousel.adapter = pageAdapter
+
+
+        dish = intent.getSerializableExtra(PLAT) as Dish
+        imageCount = dish.images.count()
+        price = dish.prices[0].price.toFloat()
+
+        itemCount = getCurrentDishCount(dish)
+
+        setUpUI(dish)
+
+        binding.btnIncrement.setOnClickListener {
+            itemCount++
+            updateUI()
         }
-        val fragment = DetailViewFragment(dish)
-        supportFragmentManager.beginTransaction().add(R.id.fragmentContainer, fragment).commit()
-    }
-
-    private fun setupView(dish: Dish) {
-        refreshShop(dish)
-
-        binding.less.setOnClickListener {
-            itemCount = max(1, itemCount - 1)
-            refreshShop(dish)
+        binding.btnDecrement.setOnClickListener {
+            if (itemCount>1){
+                itemCount--
+                updateUI()}
         }
-
-        binding.more.setOnClickListener {
-            itemCount += 1
-            refreshShop(dish)
-        }
-
-        binding.shopButton.setOnClickListener {
+        binding.btnAddToCart.setOnClickListener {
             addToBasket(dish, itemCount)
         }
     }
 
-    private fun refreshShop(dish: Dish) {
+    @SuppressLint("SetTextI18n")
+    private fun setUpUI(dish: Dish) {
+        binding.dishIngredients.text = dish.ingredients.joinToString {
+            it.name
+        }
+        binding.dishDetailName.text = dish.name
+        binding.dishDetailPrice.text = "$price €"
+        binding.quantityTextView.text = itemCount.toString()
+        binding.btnAddToCart.text = "Total ${price * itemCount} $"
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateUI() {
         val price = itemCount * dish.prices.first().price.toFloat()
-        binding.itemCount.text = itemCount.toString()
-        binding.shopButton.text = "${getString(R.string.total)} $price€"
+        binding.quantityTextView.text = itemCount.toString()
+        binding.btnAddToCart.text = "${getString(R.string.total)} $price€"
     }
 
-    private fun addToBasket(dish: Dish, count: Int) {
+    override fun onBackPressed() {
+        if (binding.imagesCarousel.currentItem == 0) {
+            super.onBackPressed()
+        } else {
+            // Else, select the previous step.
+            binding.imagesCarousel.currentItem = binding.imagesCarousel.currentItem - 1
+        }
+    }
+
+    private fun addToBasket(dish: Dish, itemCount: Int) {
         val basket = Basket.getBasket(this)
-        basket.addItem(BasketItem(dish, count))
+        basket.addItem(BasketItem(dish, itemCount))
+        refreshMenu()
         basket.save(this)
-        refreshMenu(basket)
-        Snackbar.make(binding.root, getString(R.string.basket_validation), Snackbar.LENGTH_LONG).show()
+
     }
 
-    private fun refreshMenu(basket: Basket) {
+    private fun refreshMenu() {
         invalidateOptionsMenu() // refresh l'affichage du menu
+    }
+    private fun getCurrentDishCount(dish: Dish): Int {
+        val basket = Basket.getBasket(this)
+        val selectedDish = basket.items.firstOrNull {
+            it.dish.name == dish.name
+        }
+        selectedDish?.let {
+            return selectedDish.itemCount
+        }
+        return 1
+    }
+    companion object {
+        const val BASKET_COUNT = "BASKET_COUNT"
+    }
+
+    private inner class PhotoSlideAdapter(fa: AppCompatActivity) : FragmentStateAdapter(fa) {
+        override fun getItemCount(): Int = imageCount
+
+        override fun createFragment(position: Int): Fragment = PhotoSlideFragment(dish.images[position])
     }
 }

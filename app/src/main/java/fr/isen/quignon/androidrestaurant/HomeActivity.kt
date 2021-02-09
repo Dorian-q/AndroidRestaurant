@@ -16,18 +16,17 @@ class HomeActivity : BaseActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.starter.setOnClickListener {
-            startCategoryActivity(ItemType.STARTER)
+        binding.entriesTextView.setOnClickListener {
+            startCategoryActivity(ItemType.ENTREE)
         }
 
-        binding.main.setOnClickListener {
-            startCategoryActivity(ItemType.MAIN)
+        binding.dishesTextView.setOnClickListener {
+            startCategoryActivity(ItemType.PLAT)
         }
 
-        binding.dessert.setOnClickListener {
+        binding.dessertTextView.setOnClickListener {
             startCategoryActivity(ItemType.DESSERT)
         }
-
     }
 
     private fun startCategoryActivity(item: ItemType) {
