@@ -1,16 +1,14 @@
 package fr.isen.quignon.androidrestaurant
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.Toast
+
 import fr.isen.quignon.androidrestaurant.category.CategoryActivity
 import fr.isen.quignon.androidrestaurant.category.ItemType
 import fr.isen.quignon.androidrestaurant.databinding.ActivityHomeBinding
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,20 +17,20 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.starter.setOnClickListener {
-            statCategoryActivity(ItemType.STARTER)
+            startCategoryActivity(ItemType.STARTER)
         }
 
         binding.main.setOnClickListener {
-            statCategoryActivity(ItemType.MAIN)
+            startCategoryActivity(ItemType.MAIN)
         }
 
         binding.dessert.setOnClickListener {
-            statCategoryActivity(ItemType.DESSERT)
+            startCategoryActivity(ItemType.DESSERT)
         }
 
     }
 
-    private fun statCategoryActivity(item: ItemType) {
+    private fun startCategoryActivity(item: ItemType) {
         val intent = Intent(this, CategoryActivity::class.java)
         intent.putExtra(CATEGORY_NAME, item)
         startActivity(intent)

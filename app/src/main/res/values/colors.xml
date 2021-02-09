@@ -10,4 +10,8 @@
     <color name="title">#FF9800</color>
     <color name="title2">#6C4305</color>
     <color name="clear">#00FFFFFF</color>
+    <color name="blue">#0000FF</color>
+    <color name="yellow">#FFFF00</color>
+    <color name="orange">#FF7F00</color>
+    <color name="red">#FF0000</color>
 </resources>

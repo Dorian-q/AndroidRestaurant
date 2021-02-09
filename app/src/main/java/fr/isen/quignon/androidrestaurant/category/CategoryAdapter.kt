@@ -6,8 +6,11 @@ import android.widget.ExpandableListView
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+
 import fr.isen.quignon.androidrestaurant.databinding.DishesCellBinding
 import fr.isen.quignon.androidrestaurant.network.Dish
+import fr.isen.quignon.androidrestaurant.R
+import com.squareup.picasso.Picasso
 
 class CategoryAdapter(private val entries: List<Dish>,
                       private val entryClickListener: (Dish) -> Unit)
@@ -36,7 +39,11 @@ class CategoryAdapter(private val entries: List<Dish>,
 
         fun bind(dish: Dish) {
             titleView.text = dish.name
-            priceView.text = "${dish.prices.first().price} €" // dish.prices.first().price + " €"
+            priceView.text = "${dish.prices.first().price} €"
+            Picasso.get()
+                .load(dish.getThumbnailUrl())
+                .placeholder(R.drawable.logo_resto)
+                .into(imageView)
         }
     }
 }

@@ -1,10 +1,20 @@
 <resources>
-    <string name="app_name">androidrestaurant</string>
-    <string name="hello">Bienvenue\nchez</string>
-
-    <string name="starter">Entrées</string>
-    <string name="main">Plats</string>
-    <string name="dessert">Désserts</string>
-
-    <string name="toast_content">Contenu du toast</string>
+    <string name="app_name">Dodoresto</string>
+    <string name="hello">Welcome\nto</string>
+    <string name="starter">Entries</string>
+    <string name="main">Food</string>
+    <string name="dessert">Dessert</string>
+    <string name="toast_content">Content</string>
+    <string name="total">Total</string>
+    <string name="basket_validation">Your dish has been added to basket</string>
+    <string name="basket">Basket</string>
+    <string name="order">Place an order</string>
+    <string name="quantity">Quantity :</string>
+    <string name="registrationTitle">Create account</string>
+    <string name="firstname">Firstname</string>
+    <string name="lastname">Lastname</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="register">Create account</string>
+    <string name="login">Login</string>
 </resources>
