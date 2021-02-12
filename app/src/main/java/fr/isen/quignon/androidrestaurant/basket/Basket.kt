@@ -1,11 +1,9 @@
 package fr.isen.quignon.androidrestaurant.basket
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.io.Serializable
-import fr.isen.quignon.androidrestaurant.detail.DetailActivity
 
 class Basket (val items: MutableList<BasketItem>): Serializable {
 

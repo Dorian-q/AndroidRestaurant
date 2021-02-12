@@ -1,6 +1,5 @@
 package fr.isen.quignon.androidrestaurant.category
 
-
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -21,14 +20,13 @@ import org.json.JSONObject
 import com.google.gson.GsonBuilder
 import fr.isen.quignon.androidrestaurant.BaseActivity
 import fr.isen.quignon.androidrestaurant.detail.DetailActivity
-import fr.isen.quignon.androidrestaurant.HomeActivity.Companion.CATEGORY_NAME
 import fr.isen.quignon.androidrestaurant.basket.Basket.Companion.USER_PREFERENCES_NAME
 import fr.isen.quignon.androidrestaurant.detail.DishCellClickListener
 import fr.isen.quignon.androidrestaurant.utils.Loader
 
 enum class  ItemType{
-    ENTREE,
-    PLAT,
+    STARTER,
+    DISH,
     DESSERT;
 }
 
@@ -129,16 +127,16 @@ class CategoryActivity : BaseActivity(), DishCellClickListener {
 
     private fun getCategoryTitle(item: ItemType?): String {
         return when(item) {
-            ItemType.ENTREE -> getString(R.string.entree)
-            ItemType.PLAT -> getString(R.string.plat)
+            ItemType.STARTER -> getString(R.string.entree)
+            ItemType.DISH -> getString(R.string.plat)
             ItemType.DESSERT -> getString(R.string.dessert)
             else -> ""
         }
     }
     private fun getCategoryTitleFr(item: ItemType?): String {
         return when(item) {
-            ItemType.ENTREE -> getString(R.string.entree)
-            ItemType.PLAT -> getString(R.string.plat)
+            ItemType.STARTER -> getString(R.string.entree)
+            ItemType.DISH -> getString(R.string.plat)
             ItemType.DESSERT -> getString(R.string.dessert)
             else -> ""
         }

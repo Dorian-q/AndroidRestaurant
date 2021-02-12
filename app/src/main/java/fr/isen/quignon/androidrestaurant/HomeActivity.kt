@@ -8,7 +8,7 @@ import fr.isen.quignon.androidrestaurant.category.CategoryActivity
 import fr.isen.quignon.androidrestaurant.category.ItemType
 import fr.isen.quignon.androidrestaurant.databinding.ActivityHomeBinding
 
-class HomeActivity : BaseActivity() {
+class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,11 +17,11 @@ class HomeActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.entriesTextView.setOnClickListener {
-            startCategoryActivity(ItemType.ENTREE)
+            startCategoryActivity(ItemType.STARTER)
         }
 
         binding.dishesTextView.setOnClickListener {
-            startCategoryActivity(ItemType.PLAT)
+            startCategoryActivity(ItemType.DISH)
         }
 
         binding.dessertTextView.setOnClickListener {

@@ -74,7 +74,6 @@ class DetailActivity: BaseActivity() {
         if (binding.imagesCarousel.currentItem == 0) {
             super.onBackPressed()
         } else {
-            // Else, select the previous step.
             binding.imagesCarousel.currentItem = binding.imagesCarousel.currentItem - 1
         }
     }
@@ -88,7 +87,7 @@ class DetailActivity: BaseActivity() {
     }
 
     private fun refreshMenu() {
-        invalidateOptionsMenu() // refresh l'affichage du menu
+        invalidateOptionsMenu()
     }
     private fun getCurrentDishCount(dish: Dish): Int {
         val basket = Basket.getBasket(this)
