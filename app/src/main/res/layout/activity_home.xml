@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,21 +9,22 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="103dp"
-        android:layout_height="135dp"
+        android:layout_width="wrap_content"
+        android:layout_height="140dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:contentDescription="@string/app_name"
+        android:background="@color/black"
         android:src="@drawable/logo_resto"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="TODO" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello"
-        android:textColor="@color/orange"
+        android:textColor="@color/teal_700"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -37,9 +39,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_name"
-        android:textColor="@color/orange"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:textColor="@color/blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -50,13 +52,12 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/entriesCardView"
-        android:layout_width="344dp"
-        android:layout_height="128dp"
+        android:layout_width="0dp"
+        android:layout_height="112dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="48dp"
         android:layout_marginEnd="32dp"
         android:contentDescription="@string/entree"
-        app:cardCornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title2">
@@ -89,13 +90,12 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/dishesCardView"
-        android:layout_width="344dp"
-        android:layout_height="128dp"
+        android:layout_width="345dp"
+        android:layout_height="112dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:contentDescription="@string/plat"
-        app:cardCornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entriesCardView">
@@ -127,13 +127,12 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/dessertCardView"
-        android:layout_width="344dp"
-        android:layout_height="128dp"
+        android:layout_width="0dp"
+        android:layout_height="112dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:contentDescription="@string/dessert"
-        app:cardCornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dishesCardView">

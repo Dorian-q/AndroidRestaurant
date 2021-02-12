@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Dodoresto</string>
     <string name="hello">Welcome \nto</string>
-    <string name="entree">Starter</string>
-    <string name="plat">Dish</string>
-    <string name="dessert">Dessert</string>
+    <string name="entree">Entrées</string>
+    <string name="plat">Plats</string>
+    <string name="dessert">Desserts</string>
 
     <string name="toast_content">Content</string>
     <string name="ingredients">Ingredients</string>
